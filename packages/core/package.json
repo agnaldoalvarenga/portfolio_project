@@ -1,0 +1,21 @@
+{
+  "name": "@ostentaculus/core",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./*": "./src/*.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@ostentaculus/security": "workspace:*",
+    "@ostentaculus/ai": "workspace:*",
+    "drizzle-orm": "^0.36.0",
+    "zod": "^3.23.0",
+    "@google-analytics/data": "^4.7.0",
+    "stripe": "^17.0.0"
+  }
+}

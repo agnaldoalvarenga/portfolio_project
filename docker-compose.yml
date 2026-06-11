@@ -1,0 +1,18 @@
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ostentaculus
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ostentaculus"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    volumes:
+      - ostentaculus_pgdata:/var/lib/postgresql/data
+volumes:
+  ostentaculus_pgdata:

@@ -1,0 +1,20 @@
+{
+  "name": "@ostentaculus/web",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@ostentaculus/core": "workspace:*",
+    "@ostentaculus/db": "workspace:*",
+    "@ostentaculus/security": "workspace:*",
+    "next": "^15.0.0",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0"
+  }
+}

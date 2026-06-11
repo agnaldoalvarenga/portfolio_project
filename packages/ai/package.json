@@ -1,0 +1,17 @@
+{
+  "name": "@ostentaculus/ai",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./*": "./src/*.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@ostentaculus/security": "workspace:*",
+    "@anthropic-ai/sdk": "^0.40.0",
+    "@ostentaculus/core": "workspace:*"
+  }
+}

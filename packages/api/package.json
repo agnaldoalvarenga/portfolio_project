@@ -1,0 +1,20 @@
+{
+  "name": "@ostentaculus/api",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./*": "./src/*.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@ostentaculus/core": "workspace:*",
+    "@ostentaculus/db": "workspace:*",
+    "@supabase/supabase-js": "^2.45.0",
+    "@trpc/server": "^11.0.0",
+    "drizzle-orm": "^0.36.0",
+    "zod": "^3.23.0"
+  }
+}

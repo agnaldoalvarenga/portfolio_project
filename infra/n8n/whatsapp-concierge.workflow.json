@@ -1,0 +1,152 @@
+{
+  "name": "Ostentaculus — WhatsApp Concierge",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ostentaculus-inbound",
+        "responseMode": "onReceived"
+      },
+      "name": "Ingress (from Next.js)",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "language": "javaScript",
+        "jsCode": "const crypto = require('crypto');\nconst secret = $env.N8N_SHARED_SECRET;\nconst raw = JSON.stringify($json.body);\nconst expected = 'sha256=' + crypto.createHmac('sha256', secret).update(raw).digest('hex');\nconst got = $json.headers['x-ostentaculus-signature'] || '';\nconst a = Buffer.from(expected); const b = Buffer.from(got);\nif (a.length !== b.length || !crypto.timingSafeEqual(a, b)) { throw new Error('Invalid ingress signature'); }\nconst msg = $json.body.message;\nif (msg.type !== 'location') return [];\nreturn [{ json: { from: msg.from, lat: msg.location.latitude, lng: msg.location.longitude } }];"
+      },
+      "name": "Verify HMAC + filter location",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.APP_BASE_URL }}/api/trpc/concierge.recommend",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "authorization",
+              "value": "=Bearer {{ $env.CONCIERGE_SERVICE_TOKEN }}"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"json\": { \"latitude\": {{ $json.lat }}, \"longitude\": {{ $json.lng }}, \"userText\": null, \"contact\": {{ JSON.stringify($json.from) }} } }"
+      },
+      "name": "concierge.recommend (tRPC)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        720,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "language": "javaScript",
+        "jsCode": "const r = $json.result.data.json;\nlet body = r.text;\nif (r.kind === 'recommendation') {\n  if (r.videoUrl) body += `\\n\\n🎬 Mini-documental: ${r.videoUrl}`;\n  if (r.routeUrl) body += `\\n📍 Cómo llegar: ${r.routeUrl}`;\n}\nreturn [{ json: { to: $('Verify HMAC + filter location').item.json.from, body } }];"
+      },
+      "name": "Compose reply",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        960,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/{{ $env.WHATSAPP_GRAPH_VERSION }}/{{ $env.WHATSAPP_PHONE_NUMBER_ID }}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "authorization",
+              "value": "=Bearer {{ $env.WHATSAPP_ACCESS_TOKEN }}"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"messaging_product\": \"whatsapp\", \"to\": \"{{ $json.to }}\", \"type\": \"text\", \"text\": { \"preview_url\": true, \"body\": {{ JSON.stringify($json.body) }} } }"
+      },
+      "name": "Send WhatsApp reply",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1200,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Ingress (from Next.js)": {
+      "main": [
+        [
+          {
+            "node": "Verify HMAC + filter location",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verify HMAC + filter location": {
+      "main": [
+        [
+          {
+            "node": "concierge.recommend (tRPC)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "concierge.recommend (tRPC)": {
+      "main": [
+        [
+          {
+            "node": "Compose reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compose reply": {
+      "main": [
+        [
+          {
+            "node": "Send WhatsApp reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

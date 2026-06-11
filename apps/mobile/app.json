@@ -1,0 +1,15 @@
+{
+  "expo": {
+    "name": "Ostentaculus",
+    "slug": "ostentaculus",
+    "scheme": "ostentaculus",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "ios": { "supportsTablet": true, "bundleIdentifier": "com.ostentaculus.app",
+             "infoPlist": { "NSLocationWhenInUseUsageDescription": "Para recomendar estabelecimentos curados perto de você." } },
+    "android": { "package": "com.ostentaculus.app",
+                 "permissions": ["ACCESS_FINE_LOCATION", "ACCESS_COARSE_LOCATION"] },
+    "extra": { "apiBaseUrl": "https://app.ostentaculus.com" }
+  }
+}
