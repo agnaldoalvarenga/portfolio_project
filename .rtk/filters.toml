@@ -1,0 +1,135 @@
+# Project-local RTK filters for ostentaculus-platform.
+# Version-controlled so they sync to every machine (Mac + VPS) via `git pull`.
+# Activate once per machine with:  rtk trust   (run from the repo root)
+# These take precedence over ~/.config/rtk/filters.toml and the built-ins.
+# Docs: https://github.com/rtk-ai/rtk#custom-filters
+#
+# Design rule: only proven-noise lines are stripped (progress / housekeeping).
+# Errors, warnings, summaries and package lists are always kept — no quality loss.
+schema_version = 1
+
+# ── apt / apt-get ──────────────────────────────────────────────────────────
+# VPS package management (Ubuntu). Strips housekeeping + download/unpack
+# progress; keeps the install summary, package list, warnings (W:) and errors (E:).
+[filters.apt]
+description = "Compact apt/apt-get — strip progress/housekeeping, keep summary+warnings+errors"
+match_command = "^(sudo\\s+)?apt(-get)?\\b"
+strip_ansi = true
+strip_lines_matching = [
+  "^\\s*$",
+  "^Reading package lists",
+  "^Building dependency tree",
+  "^Reading state information",
+  "^Get:\\d+\\s",
+  "^Hit:\\d+\\s",
+  "^Ign:\\d+\\s",
+  "^Fetched\\s",
+  "^\\(Reading database",
+  "^Preparing to unpack",
+  "^Unpacking\\s",
+  "^Selecting previously unselected",
+  "^Setting up\\s",
+  "^Processing triggers",
+  "^Progress:",
+]
+
+[[tests.apt]]
+name = "apt install keeps summary and drops progress"
+input = """
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+The following NEW packages will be installed:
+  curl
+0 upgraded, 1 newly installed, 0 to remove and 3 not upgraded.
+Need to get 227 kB of archives.
+Get:1 http://archive.ubuntu.com/ubuntu noble/main amd64 curl amd64 8.5.0 [227 kB]
+Fetched 227 kB in 0s (1,000 kB/s)
+Selecting previously unselected package curl.
+(Reading database ... 100000 files and directories currently installed.)
+Preparing to unpack .../curl_8.5.0_amd64.deb ...
+Unpacking curl (8.5.0) ...
+Setting up curl (8.5.0) ...
+Processing triggers for man-db (2.12.0) ...
+"""
+expected = """
+The following NEW packages will be installed:
+  curl
+0 upgraded, 1 newly installed, 0 to remove and 3 not upgraded.
+Need to get 227 kB of archives."""
+
+[[tests.apt]]
+name = "empty input passes through"
+input = ""
+expected = ""
+
+# ── docker compose up / pull / start ───────────────────────────────────────
+# Strips image-layer pull progress; keeps Created / Started / Running + errors.
+# filter_stderr = true because compose prints Creating/Starting to stderr.
+[filters.docker-compose-up]
+description = "Compact docker compose up/pull — strip layer-pull progress, keep create/start/errors"
+match_command = "^docker\\s+compose\\s+(up|pull|start)\\b"
+strip_ansi = true
+filter_stderr = true
+strip_lines_matching = [
+  "^\\s*$",
+  "\\bPulling\\b",
+  "\\bWaiting\\b",
+  "\\bExtracting\\b",
+  "\\bDownloading\\b",
+  "\\bDownload complete\\b",
+  "\\bPull complete\\b",
+  "\\bAlready exists\\b",
+  "\\bVerifying Checksum\\b",
+  "\\bPulled\\b",
+]
+
+[[tests.docker-compose-up]]
+name = "compose up strips pull progress keeps container state"
+input = """
+db Pulling
+abc123 Pulling fs layer
+abc123 Downloading  [====>   ]  1.2MB/5MB
+abc123 Extracting  [========>]  5MB/5MB
+abc123 Pull complete
+db Pulled
+Container ostentaculus-db-1  Creating
+Container ostentaculus-db-1  Created
+Container ostentaculus-db-1  Starting
+Container ostentaculus-db-1  Started
+"""
+expected = """
+Container ostentaculus-db-1  Creating
+Container ostentaculus-db-1  Created
+Container ostentaculus-db-1  Starting
+Container ostentaculus-db-1  Started"""
+
+# ── journalctl (conservative: zero log-content loss) ───────────────────────
+# Only removes systemd meta banners + blank lines + trims absurdly long lines.
+# No actual log line is dropped. For aggressive savings on huge dumps,
+# uncomment tail_lines below (keeps only the newest N lines).
+[filters.journalctl]
+description = "Trim journalctl banners & blank lines — no log content dropped"
+match_command = "^(sudo\\s+)?journalctl\\b"
+strip_ansi = true
+strip_lines_matching = [
+  "^\\s*$",
+  "^-- Logs begin at ",
+  "^-- No entries --$",
+  "^-- Boot ",
+  "^-- Reboot --$",
+]
+truncate_lines_at = 300
+# tail_lines = 80   # ← uncomment for aggressive savings (keeps only newest 80 lines)
+
+[[tests.journalctl]]
+name = "strips banner keeps log lines"
+input = """
+-- Logs begin at Mon 2024-01-15 10:00:00 UTC. --
+
+Jan 15 10:30:00 host app[1234]: server started on :3000
+Jan 15 10:30:05 host app[1234]: ERROR db connection refused
+"""
+expected = """
+Jan 15 10:30:00 host app[1234]: server started on :3000
+Jan 15 10:30:05 host app[1234]: ERROR db connection refused"""
