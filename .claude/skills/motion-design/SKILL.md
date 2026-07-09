@@ -67,16 +67,16 @@ Save all answers before proceeding.
 
 Ask them to upload the file directly in chat. Accept PNG, JPG, SVG, or any image.
 
-Once uploaded, note the file path from `/uploads/`. Use `mcp__higgsfield__media_upload` to register it. Then proceed to **STEP 3**.
+Once uploaded, note the file path from `/uploads/`. Use `mcp__Higgsfield__media_upload` to register it. Then proceed to **STEP 3**.
 
 ### If user has NO assets:
 
-Generate a base visual using **GPT Image 2**. Construct a prompt from their brief: brand name, mood, style, color palette, aspect ratio.
+Generate a base visual using **Nano Banana**. Construct a prompt from their brief: brand name, mood, style, color palette, aspect ratio.
 
-Model priority: `gpt-image-2-pro` → `gpt-image-2-banana` → `gpt-image-2-nano`
+Model priority: `nano_banana_pro` → `nano_banana_2` → `nano_banana`. For logo/icon/vector or clean product-mockup work, use `recraft_v4_1` instead.
 
-Call `mcp__higgsfield__generate_image` with the best available GPT Image 2 variant.
-Display result with `mcp__higgsfield__job_display`.
+Call `mcp__Higgsfield__generate_image` with the best available model above.
+Display result with `mcp__Higgsfield__job_display`.
 
 Ask: "Does this image work or would you like changes?" — if changes needed, regenerate with adjusted prompt. Once approved, proceed.
 
@@ -97,7 +97,7 @@ This is the core creative step. Generate a storyboard with N frames (where N = t
 
 **Generation approach:**
 
-Call `mcp__higgsfield__generate_image` **once** with **GPT Image 2** to generate a **single storyboard sheet** — one image containing all N panels arranged in a grid. Do NOT generate N separate images.
+Call `mcp__Higgsfield__generate_image` **once** with **Nano Banana** (`nano_banana_pro`, falling back to `nano_banana_2`) to generate a **single storyboard sheet** — one image containing all N panels arranged in a grid. Do NOT generate N separate images.
 
 Use the approved asset / generated visual as a reference image in the call.
 
@@ -106,7 +106,7 @@ Construct the prompt as:
 Storyboard sheet with [N] sequential panels in a grid layout, each panel labeled "Frame 1", "Frame 2", etc. Panel 1: [scene description]. Panel 2: [scene description]. ... Panel N: [logo lock / brand name]. Each panel shows: [camera angle], [motion state], [mood/lighting]. Visual style: [cinematic/kinetic]. Consistent color palette throughout. Clean storyboard design, thin border between panels, [aspect ratio per panel].
 ```
 
-After the single image is generated, display it with `mcp__higgsfield__job_display`.
+After the single image is generated, display it with `mcp__Higgsfield__job_display`.
 
 Then present the storyboard summary:
 
@@ -135,7 +135,7 @@ Options:
 
 Once the storyboard is approved, generate the final video using **Seedance 2.0**.
 
-Use `mcp__higgsfield__models_explore` to confirm the exact Seedance 2.0 model ID if needed.
+Use `mcp__Higgsfield__models_explore` to confirm the exact Seedance 2.0 model ID if needed.
 
 **Construct the video generation prompt** combining:
 - Approved storyboard narrative (scene sequence)
@@ -159,8 +159,8 @@ Use `mcp__higgsfield__models_explore` to confirm the exact Seedance 2.0 model ID
 
 Pass as `start_image` in medias: the original uploaded asset (if user had one) — otherwise the first approved storyboard frame job ID.
 
-Call `mcp__higgsfield__generate_video` with model `seedance_2_0` (or confirmed ID).
-Display result with `mcp__higgsfield__job_display`.
+Call `mcp__Higgsfield__generate_video` with model `seedance_2_0` (or confirmed ID).
+Display result with `mcp__Higgsfield__job_display`.
 
 ---
 
@@ -181,14 +181,14 @@ Options:
 ## Notes & Rules
 
 - **Always ask all intake questions at once** in Step 1 — never split into multiple rounds
-- **Tool names:** use `mcp__higgsfield__generate_image`, `mcp__higgsfield__generate_video`, `mcp__higgsfield__job_display`, `mcp__higgsfield__media_upload`, `mcp__higgsfield__media_confirm`, `mcp__higgsfield__models_explore`, `mcp__higgsfield__balance` — confirm exact IDs with `tool_search` if unsure
-- **Image model:** GPT Image 2 only — `gpt-image-2-pro` → `gpt-image-2-banana` → `gpt-image-2-nano`
-- **Video model:** Seedance 2.0 only — confirm model ID with `models_explore` if unsure
-- **Storyboard = one image** — a single grid sheet with all N panels, generated in one GPT Image 2 call. Never generate N separate images
+- **Tool names:** use `mcp__Higgsfield__generate_image`, `mcp__Higgsfield__generate_video`, `mcp__Higgsfield__job_display`, `mcp__Higgsfield__media_upload`, `mcp__Higgsfield__media_confirm`, `mcp__Higgsfield__models_explore`, `mcp__Higgsfield__balance` (note the capital **H**) — confirm exact IDs with `models_explore` if unsure
+- **Image model:** Nano Banana — `nano_banana_pro` → `nano_banana_2` → `nano_banana`; use `recraft_v4_1` for logos/icons/vector and clean product mockups
+- **Video model:** Seedance 2.0 (`seedance_2_0`) — confirm model ID with `models_explore` if unsure
+- **Storyboard = one image** — a single grid sheet with all N panels, generated in one Nano Banana call. Never generate N separate images
 - **No moodboard step** — go directly from brief to storyboard
 - **highMD rule:** no realistic humans — only silhouettes, chrome figures, 3D abstract shapes
 - **highMD rule:** logo lock duration is proportional to clip length (~1s / ~2s / ~2–3s for 5s / 10s / 15s clips), built into the prompt
 - **classicMD logo:** can appear as opener, closer, or both — ask if not specified
 - **Language:** always match the user's language
-- Check credits with `mcp__higgsfield__balance` if user seems concerned about usage
+- Check credits with `mcp__Higgsfield__balance` if user seems concerned about usage
 - If generation fails — explain briefly and offer retry with adjusted parameters
