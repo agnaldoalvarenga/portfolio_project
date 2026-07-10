@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@ostentaculus/ai": "workspace:*",
     "@ostentaculus/core": "workspace:*",
     "@ostentaculus/db": "workspace:*",
     "@supabase/supabase-js": "^2.45.0",

@@ -2,6 +2,7 @@ import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { router, serviceProcedure } from "../trpc";
 import { recommendEstablishment } from "@ostentaculus/core/concierge/recommend";
+import { composeConciergeMessage } from "@ostentaculus/ai/concierge";
 import { prepareUserText } from "@ostentaculus/core/concierge/guardrails";
 import { resolveRegion } from "@ostentaculus/core/maps/region";
 import { recordConciergeLead } from "@ostentaculus/core/leads/record";
@@ -22,7 +23,7 @@ export const conciergeRouter = router({
           point: { latitude: input.latitude, longitude: input.longitude },
           userText: prepareUserText(input.userText),
           locale: input.locale,
-        });
+        }, composeConciergeMessage);
 
         // FASE 3 — attribute the recommendation to the establishment as a lead.
         if (result.kind === "recommendation" && result.establishmentId && input.contact) {

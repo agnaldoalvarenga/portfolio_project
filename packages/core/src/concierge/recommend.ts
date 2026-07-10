@@ -1,8 +1,18 @@
 import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { findNearestEstablishment } from "./geofencing";
 import { buildWalkingRouteUrl, buildYouTubeWatchUrl, type LatLng } from "../maps/route";
-import { composeConciergeMessage } from "@ostentaculus/ai/concierge";
 import { redactPII } from "./pii";
+
+/**
+ * Concierge message composer, injected by the caller. Kept as an interface so
+ * `core` does not depend on `@ostentaculus/ai` (that edge would form a package
+ * cycle, since `ai` already builds on `core`).
+ */
+export type ComposeConciergeMessage = (args: {
+  userText: string | null;
+  establishment: NonNullable<Awaited<ReturnType<typeof findNearestEstablishment>>>;
+  locale?: string;
+}) => Promise<{ refused: boolean; message: string }>;
 
 export interface RecommendInput {
   point: LatLng;
@@ -22,6 +32,7 @@ export interface RecommendOutput {
 export async function recommendEstablishment(
   db: PostgresJsDatabase,
   input: RecommendInput,
+  composeConciergeMessage: ComposeConciergeMessage,
 ): Promise<RecommendOutput> {
   const establishment = await findNearestEstablishment(db, input.point);
   if (!establishment) {

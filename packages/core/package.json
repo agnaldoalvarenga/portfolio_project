@@ -12,7 +12,6 @@
   },
   "dependencies": {
     "@ostentaculus/security": "workspace:*",
-    "@ostentaculus/ai": "workspace:*",
     "drizzle-orm": "^0.36.0",
     "zod": "^3.23.0",
     "@google-analytics/data": "^4.7.0",
