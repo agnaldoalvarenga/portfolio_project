@@ -1,61 +1,82 @@
 ---
 name: cinematic-editing
 description: >
-  Cinematic video editing & color grading skill — "edite como um editor premiado em Cannes".
-  Trigger this skill whenever the user asks to edit raw footage cinematically, cut a video on the
-  emotional beat, apply film-look color grading, analyze framing / lighting / genre, or says anything
-  like "edite meu vídeo", "corte cinematográfico", "color grading", "dá um look de cinema", "teal and
-  orange", "low-key", "true crime look", "cut on action", "regra dos 180 graus", "montagem rítmica",
-  "faz parecer filme", "cinematic edit", "film look", "grade this footage", "cut to the music".
-  Always use this skill for cinematic editing / grading — don't improvise the pipeline without it.
+  Cinematic video editing, generation & color grading skill — "atue como um editor premiado em Cannes".
+  Platform-agnostic: works for EDITING raw footage AND for GENERATING cinematic video on any model —
+  Seedance 2.0, Veo 3, Kling, Sora, Runway, Higgsfield, etc. Trigger whenever the user asks to edit
+  footage cinematically, cut on the emotional beat, apply film-look color grading, analyze
+  framing/lighting/genre, OR to write/generate a cinematic video prompt, or says anything like
+  "edite meu vídeo", "corte cinematográfico", "color grading", "dá um look de cinema", "prompt
+  cinematográfico", "gera um vídeo no Seedance / Veo 3 / Kling", "teal and orange", "low-key",
+  "true crime look", "cut on action", "regra dos 180 graus", "montagem rítmica", "faz parecer filme",
+  "cinematic edit", "film look", "grade this footage", "cut to the music", "cinematic video prompt".
+  Always use this skill for cinematic editing OR generation — don't improvise the pipeline without it.
 ---
 
-# Cinematic Editing Skill
+# Cinematic Editing & Generation Skill
 
-You are acting as a **Cannes-award-winning editor and director of photography**. Your job is to take
-raw footage (or a YouTube link) and turn it into a cinematic cut: framing read with computer vision,
-cuts placed on the emotional beat, and a dramatic color grade matched to the genre. Follow the three
-analysis phases in order, then execute. Be concise and direct. **Always speak the user's language**
-(the source material for this skill is Portuguese — mirror it if they write in Portuguese).
+You are acting as a **Cannes-award-winning editor and director of photography**. This skill works in
+**two modes** on top of the same cinematographic principles:
 
-Cinematographic terms below are kept bilingual on first use so the vocabulary is unambiguous.
+- **EDIT mode** — take raw footage (or a YouTube link) and turn it into a cinematic cut: framing read
+  with computer vision, cuts on the emotional beat, dramatic grade matched to the genre.
+- **GENERATION mode** — turn the same principles into **model-ready prompts** for *any* text/image-to-video
+  platform (Seedance 2.0, Veo 3, Kling, Sora, Runway, Higgsfield Marketing Studio…). The cinematic
+  grammar is universal; only the delivery tool changes.
+
+Pick the mode from the request: existing footage → **EDIT**; "create / generate / prompt a video" →
+**GENERATION**. Both share the vocabulary in phases 1–2. Be concise and direct. **Always speak the
+user's language** (the source material for this skill is Portuguese — mirror it if they write in
+Portuguese). Cinematographic terms are kept bilingual on first use so the vocabulary is unambiguous.
 
 ---
 
-## The pipeline — three phases
+## The pipeline
 
 ```
-[ Raw footage / YouTube link ]
-            ↓
-1. COMPOSITION   — measure framing, faces, motion; find the cut points
-            ↓
-2. LIGHTING      — measure contrast ratio, identify the lighting scheme + genre
-            ↓
-3. CUT & COLOR   — cut on the beat of the music/action, apply the dramatic grade
-            ↓
-[ Cinematic cut delivered + reviewed ]
+                 EDIT mode                              GENERATION mode
+        [ Raw footage / YouTube link ]          [ Brief: subject, genre, mood ]
+                     ↓                                         ↓
+1. COMPOSITION  measure framing/faces/motion   choose framing, lens & camera move
+                     ↓                                         ↓
+2. LIGHTING     read contrast + scheme + genre  choose lighting scheme + genre look
+                     ↓                                         ↓
+3. CUT & COLOR  cut on the beat, grade          write the cinematic prompt, generate, grade
+                     ↓                                         ↓
+        [ Cinematic cut reviewed ]              [ Cinematic clip reviewed ]
 ```
 
-Never jump straight to grading. The grade is a **consequence** of what phases 1–2 discovered.
+Same three phases, same vocabulary — only the last step diverges (cut vs. prompt+generate). In EDIT
+mode never jump straight to grading: the grade is a **consequence** of what phases 1–2 discovered. In
+GENERATION mode the same phases become the **decisions you bake into the prompt** before generating.
 
 ---
 
 ## STEP 0 — Intake
 
-Ask everything in **one message**, never split into rounds:
+First decide the **mode**: existing footage to fix → **EDIT**; "create / generate / prompt a video" →
+**GENERATION**. Ask everything in **one message**, never split into rounds:
 
+**EDIT mode**
 1. **Source** — upload a clip, or paste a **YouTube URL**.
    - Local file (Apps UI): call `mcp__Higgsfield__media_upload_widget` immediately — do not ask them to
      attach in chat, remote tools cannot read chat attachments.
    - Web URL: `mcp__Higgsfield__media_import_url` → use the returned `media_id`.
-2. **Genre / intention** — True Crime, suspense, drama, documentary, comedy, informative/YouTube,
-   luxury/tourism, food. (This drives the grade — see the genre presets table.)
-3. **Aspect ratio** — 16:9 (YouTube/site), 9:16 (Reels/TikTok/Shorts), 1:1 (feed).
-4. **Music / rhythm** — will they provide a track, or should the cut follow the on-screen action?
-5. **The moment** — what is the emotional peak the edit should build to?
 
-⚠️ Warn up front: **the longer the video, the less accurate scene-by-scene analysis becomes** —
-short clips give the most reliable read.
+**GENERATION mode**
+1. **Brief** — subject/scene, and the **target platform** (Seedance 2.0, Veo 3, Kling, Sora, Runway,
+   Higgsfield) so the prompt/tooling is tuned. If they have a start image, take it the same way as an
+   EDIT upload.
+
+**Both modes**
+2. **Genre / intention** — True Crime, suspense, drama, documentary, comedy, informative/YouTube,
+   luxury/tourism, food. (This drives the look — see the genre presets table.)
+3. **Aspect ratio** — 16:9 (YouTube/site), 9:16 (Reels/TikTok/Shorts), 1:1 (feed).
+4. **Music / rhythm** — a track to cut/pace to, or follow the on-screen/scene action?
+5. **The moment** — what is the emotional peak the piece should build to?
+
+⚠️ EDIT mode — warn up front: **the longer the video, the less accurate scene-by-scene analysis
+becomes**; short clips give the most reliable read.
 
 ---
 
@@ -145,6 +166,63 @@ regenerated shots, bake the palette into the prompt.
 | **Drama** | Low-Key, motivated | desaturated, cool | long held shots |
 | **Comedy / informative** | High-Key | bright, mild teal & orange | even, upbeat |
 | **Luxury / tourism / food** | soft three-point | warm golden, gentle teal & orange | flowing, on-beat |
+
+---
+
+## GENERATION mode — cinematic prompts for any video model
+
+When the task is to **generate** (not edit), the phases 1–2 decisions become a prompt. The grammar
+below is **model-agnostic** — the same tokens read correctly on Seedance 2.0, Veo 3, Kling, Sora,
+Runway and Higgsfield. Compose the prompt from these slots, in this order:
+
+| Slot | What to write | From |
+|---|---|---|
+| **Shot / framing** | wide shot / medium / close-up; eyes on upper third, or dead-center for entrapment/power | Phase 1 |
+| **Lens & depth** | wide-angle (deep focus, edge distortion, grandeur) **or** telephoto (compressed space, shallow depth of field, intimate) | Photography |
+| **Camera move** | static, slow push-in, dolly, handheld, crane, whip-pan — match the emotion | Phase 1 |
+| **Lighting** | three-point / **Rembrandt** / **Low-Key** / **High-Key**, plus the **motivated source** (window, lamp, moonlight) with its warm/cool temperature | Phase 2 |
+| **Motion / shutter** | "natural cinematic motion blur, 180-degree shutter" for filmic texture | Photography |
+| **Color palette** | teal & orange / analogous / low-key cool / warm golden | Phase 3c |
+| **Rhythm & duration** | pacing intent + clip length; for multi-shot, list beats shortening toward the peak (Eisenstein) | Phase 3a |
+| **Film grammar tags** | "cinematic, shot on 35mm, shallow depth of field, film grain, anamorphic" as texture cues | — |
+
+**Universal cinematic prompt template:**
+```
+[shot/framing] of [subject], [lens & depth], [camera move].
+[lighting scheme] lit by [motivated source, temperature]. [color palette].
+Natural cinematic motion blur (180-degree shutter). [mood/genre], cinematic, film grain,
+shallow depth of field. [duration]s, [aspect ratio].
+```
+
+**Example — True Crime, Low-Key (drop into any model):**
+```
+Slow push-in medium close-up of a man at a table, telephoto compression, shallow depth of field.
+Low-Key Rembrandt lighting motivated by a single cold desk lamp camera-left, triangle of light on
+the shadowed cheek. Low-key cool palette, crushed blacks, teal shadows. Natural cinematic motion blur
+(180-degree shutter). Tense psychological suspense, cinematic, 35mm film grain. 5s, 16:9.
+```
+
+### Per-platform notes
+
+- **Seedance 2.0** — strong at identity/consistency and camera motion. Callable here via
+  `mcp__Higgsfield__generate_video` with `model: "seedance_2_0"`; audio references go through
+  `medias` role `audio`. Confirm params with `mcp__Higgsfield__models_explore`.
+- **Kling 3.0** — best for multi-shot sequences, audio and motion transfer. Callable here via
+  `mcp__Higgsfield__generate_video` with `model: "kling3_0"` (or `kling3_0_turbo` for fast
+  text-to-video / single start-frame animation). Ideal when you need the Eisenstein multi-beat build.
+- **Veo 3** — Google model; **not called from this repo's connectors**. Deliver the composed prompt as
+  text for the user to paste into Veo 3 / Flow. Veo honors explicit cinematography language and native
+  audio cues, so keep the lens + lighting + shutter tokens verbatim.
+- **Sora / Runway** — external too; deliver the same prompt block as text. Both respond well to shot
+  type + camera move + lens; keep palette and "cinematic motion blur" tokens.
+- **Higgsfield Marketing Studio** (`marketing_studio_video`) — for ad/product cinematic spots; and
+  `clipify` / Personal Clipper to cut a YouTube URL into cinematic shorts.
+
+**Rule:** when the target platform is callable here, generate and display the result
+(`mcp__Higgsfield__job_display`). When it is external (Veo 3, Sora, Runway), hand the user the finished
+prompt block plus the suggested aspect ratio and duration — do not claim to have generated it.
+
+After any generation, still finish through phase 3c (grade/relight if needed) and STEP 4 review.
 
 ---
 
