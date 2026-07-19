@@ -1,0 +1,407 @@
+<title>Ostentaculus — Food &amp; Tourism Marketing Agency · Cinema</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root{
+    --ground:#0E0B09; --ground-2:#17120E; --ground-3:#1F1813;
+    --line:rgba(212,175,55,.14); --line-strong:rgba(212,175,55,.28);
+    --ink:#F3ECE0; --ink-soft:#B8A99A; --ink-faint:#8A7D70;
+    --gold:#D4AF37; --gold-soft:#E7CE86; --teal:#1D9E75; --bordo:#8B1A1A;
+    --serif:"Iowan Old Style","Palatino Linotype","Book Antiqua",Palatino,Georgia,"Times New Roman",serif;
+    --sans:ui-sans-serif,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --maxw:1140px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; background:var(--ground); color:var(--ink);
+    font-family:var(--sans); font-size:17px; line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    background-image:
+      radial-gradient(1100px 600px at 78% -8%, rgba(139,26,26,.14), transparent 60%),
+      radial-gradient(900px 520px at 8% 0%, rgba(212,175,55,.06), transparent 55%);
+  }
+  .wrap{max-width:var(--maxw); margin:0 auto; padding:0 28px}
+  a{color:inherit}
+  ::selection{background:rgba(212,175,55,.28); color:#fff}
+  :focus-visible{outline:2px solid var(--gold); outline-offset:3px; border-radius:4px}
+
+  /* ---------- Nav ---------- */
+  nav{position:sticky; top:0; z-index:20;
+    backdrop-filter:blur(10px); background:rgba(14,11,9,.72);
+    border-bottom:1px solid var(--line)}
+  .nav-inner{display:flex; align-items:center; justify-content:space-between;
+    padding:16px 28px; max-width:var(--maxw); margin:0 auto}
+  .brand{display:flex; flex-direction:column; line-height:1}
+  .brand b{font-family:var(--serif); font-weight:600; letter-spacing:.34em;
+    font-size:15px; color:var(--ink)}
+  .brand span{font-size:9.5px; letter-spacing:.42em; text-transform:uppercase;
+    color:var(--gold); margin-top:6px}
+  .lang{display:flex; gap:2px; align-items:center}
+  .lang button{
+    font:inherit; font-size:12.5px; letter-spacing:.18em; font-weight:600;
+    background:none; border:0; color:var(--ink-faint); cursor:pointer;
+    padding:8px 10px 12px; position:relative; text-transform:uppercase}
+  .lang button:hover{color:var(--ink-soft)}
+  .lang .sep{color:var(--ink-faint); opacity:.4; pointer-events:none; padding:0 1px}
+  .lang button[aria-pressed="true"]{color:var(--gold)}
+  .lang button[aria-pressed="true"]::after{
+    content:""; position:absolute; left:50%; bottom:2px; width:5px; height:5px;
+    transform:translateX(-50%); border-radius:50%; background:var(--teal);
+    box-shadow:0 0 0 0 rgba(29,158,117,.6); animation:pulse 2.4s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(29,158,117,.55)}
+    70%{box-shadow:0 0 0 7px rgba(29,158,117,0)}100%{box-shadow:0 0 0 0 rgba(29,158,117,0)}}
+
+  /* ---------- Manifesto / Hero ---------- */
+  header.hero{padding:96px 0 76px; text-align:center; position:relative}
+  .eyebrow{font-size:11px; letter-spacing:.44em; text-transform:uppercase;
+    color:var(--gold); display:inline-flex; align-items:center; gap:12px}
+  .eyebrow::before,.eyebrow::after{content:""; width:34px; height:1px;
+    background:linear-gradient(90deg,transparent,var(--gold-soft))}
+  .eyebrow::after{background:linear-gradient(90deg,var(--gold-soft),transparent)}
+  .slogan{font-family:var(--serif); font-weight:500;
+    font-size:clamp(30px,5.4vw,60px); line-height:1.16; letter-spacing:.005em;
+    margin:30px auto 8px; max-width:16ch; text-wrap:balance;
+    color:var(--ink)}
+  .slogan .accent{color:var(--gold-soft); font-style:italic}
+  .live{display:inline-flex; align-items:center; gap:9px; margin-top:14px;
+    font-size:11px; letter-spacing:.34em; text-transform:uppercase; color:var(--ink-faint)}
+  .live .dot{width:7px; height:7px; border-radius:50%; background:var(--teal);
+    box-shadow:0 0 10px rgba(29,158,117,.9); animation:pulse 2.4s infinite}
+  .lede{max-width:60ch; margin:26px auto 0; color:var(--ink-soft); font-size:18px}
+  .cta-row{display:flex; gap:16px; justify-content:center; flex-wrap:wrap; margin-top:38px}
+  .btn{font:inherit; font-weight:600; font-size:15px; letter-spacing:.01em;
+    padding:15px 26px; border-radius:2px; cursor:pointer; border:1px solid transparent;
+    text-decoration:none; display:inline-flex; align-items:center; gap:10px; transition:.2s}
+  .btn-gold{background:linear-gradient(180deg,var(--gold-soft),var(--gold));
+    color:#241a05; border-color:var(--gold)}
+  .btn-gold:hover{transform:translateY(-2px); box-shadow:0 12px 30px -12px rgba(212,175,55,.55)}
+  .btn-ghost{background:transparent; color:var(--ink); border-color:var(--line-strong)}
+  .btn-ghost:hover{border-color:var(--gold); color:var(--gold-soft)}
+
+  /* ---------- Sections ---------- */
+  section{padding:64px 0; border-top:1px solid var(--line)}
+  .sec-head{display:flex; align-items:baseline; gap:16px; margin-bottom:34px; flex-wrap:wrap}
+  .sec-kicker{font-family:var(--serif); font-size:12px; letter-spacing:.4em;
+    text-transform:uppercase; color:var(--gold)}
+  .sec-title{font-family:var(--serif); font-size:clamp(24px,3.2vw,34px); font-weight:500;
+    margin:0; color:var(--ink); text-wrap:balance}
+  .sec-sub{color:var(--ink-soft); max-width:62ch; margin:0}
+
+  /* Vectors */
+  .vgrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:1px;
+    background:var(--line); border:1px solid var(--line); border-radius:3px; overflow:hidden}
+  .vcell{background:var(--ground-2); padding:26px 24px; transition:.25s; position:relative}
+  .vcell:hover{background:var(--ground-3)}
+  .vcell .num{font-family:var(--serif); font-size:13px; color:var(--gold); letter-spacing:.1em}
+  .vcell h3{font-family:var(--serif); font-weight:500; font-size:19px; margin:12px 0 8px}
+  .vcell p{margin:0; font-size:14.5px; color:var(--ink-soft); line-height:1.55}
+  .vcell::after{content:""; position:absolute; left:24px; bottom:20px; width:0; height:2px;
+    background:var(--teal); transition:width .3s}
+  .vcell:hover::after{width:34px}
+
+  /* Moat comparison */
+  .moat{display:flex; flex-direction:column; gap:14px}
+  .moat-row{display:grid; grid-template-columns:1fr auto 1.15fr; gap:20px; align-items:center;
+    background:var(--ground-2); border:1px solid var(--line); border-radius:3px; padding:22px 24px}
+  .moat .them{color:var(--ink-soft)}
+  .moat .them b{display:block; color:var(--ink-faint); font-size:11px; letter-spacing:.22em;
+    text-transform:uppercase; margin-bottom:6px; font-weight:600}
+  .moat .arrow{color:var(--gold); font-size:20px}
+  .moat .us{color:var(--ink)}
+  .moat .us b{display:block; color:var(--gold); font-size:11px; letter-spacing:.22em;
+    text-transform:uppercase; margin-bottom:6px; font-weight:700}
+  .moat .us span{font-family:var(--serif); font-size:17px}
+
+  /* Retainers */
+  .cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:18px}
+  .card{background:var(--ground-2); border:1px solid var(--line); border-radius:4px;
+    padding:30px 26px; display:flex; flex-direction:column; transition:.25s}
+  .card:hover{border-color:var(--line-strong); transform:translateY(-3px)}
+  .card.feature{border-color:var(--gold); background:linear-gradient(180deg,rgba(212,175,55,.06),var(--ground-2))}
+  .card .tier{font-size:11px; letter-spacing:.3em; text-transform:uppercase; color:var(--gold)}
+  .card .badge{float:right; font-size:9.5px; letter-spacing:.22em; text-transform:uppercase;
+    color:var(--teal); border:1px solid rgba(29,158,117,.4); border-radius:20px; padding:3px 9px}
+  .card .price{font-family:var(--serif); font-size:36px; margin:14px 0 2px;
+    font-variant-numeric:tabular-nums; color:var(--ink)}
+  .card .price small{font-size:15px; color:var(--ink-faint); font-family:var(--sans)}
+  .card ul{list-style:none; padding:0; margin:20px 0 26px; display:flex; flex-direction:column; gap:12px}
+  .card li{font-size:14.5px; color:var(--ink-soft); padding-left:22px; position:relative}
+  .card li::before{content:""; position:absolute; left:0; top:9px; width:9px; height:9px;
+    border-radius:50%; border:1.5px solid var(--gold)}
+  .card .btn{margin-top:auto; justify-content:center}
+
+  /* Final CTA */
+  .band{text-align:center; background:
+    radial-gradient(700px 300px at 50% 0%, rgba(139,26,26,.2), transparent 70%);}
+  .band h2{font-family:var(--serif); font-weight:500; font-size:clamp(26px,4vw,42px);
+    margin:0 auto 14px; max-width:20ch; text-wrap:balance}
+  .band p{color:var(--ink-soft); max-width:56ch; margin:0 auto 30px}
+
+  footer{border-top:1px solid var(--line); padding:38px 0 56px; color:var(--ink-faint); font-size:13px}
+  .foot-inner{display:flex; justify-content:space-between; gap:20px; flex-wrap:wrap; align-items:center}
+  .foot-inner b{font-family:var(--serif); letter-spacing:.3em; color:var(--ink-soft); font-weight:500}
+
+  @media (max-width:720px){
+    .moat-row{grid-template-columns:1fr; gap:12px; text-align:left}
+    .moat .arrow{transform:rotate(90deg); justify-self:start}
+    header.hero{padding:64px 0 52px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none !important; transition:none !important; scroll-behavior:auto}
+  }
+</style>
+
+<nav>
+  <div class="nav-inner">
+    <div class="brand">
+      <b>OSTENTACULUS</b>
+      <span data-i18n="brandTag">Food &amp; Tourism Marketing · Cinema</span>
+    </div>
+    <div class="lang" role="group" aria-label="Language">
+      <button data-lang="pt-BR" aria-pressed="true">PT</button><span class="sep">|</span>
+      <button data-lang="es" aria-pressed="false">ES</button><span class="sep">|</span>
+      <button data-lang="en" aria-pressed="false">EN</button>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow" data-i18n="eyebrow">Barcelona · España · Portugal · Brasil · LATAM</div>
+    <h1 class="slogan" data-i18n-html="slogan"></h1>
+    <div class="live"><span class="dot"></span><span data-i18n="live">Live data stream</span></div>
+    <p class="lede" data-i18n="lede"></p>
+    <div class="cta-row">
+      <a class="btn btn-gold" href="#contact" data-i18n="ctaPrimary"></a>
+      <a class="btn btn-ghost" href="#vectors" data-i18n="ctaSecondary"></a>
+    </div>
+  </div>
+</header>
+
+<section id="vectors">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-kicker" data-i18n="vecKicker">01</span>
+      <div>
+        <h2 class="sec-title" data-i18n="vecTitle"></h2>
+      </div>
+    </div>
+    <div class="vgrid" id="vgrid"></div>
+  </div>
+</section>
+
+<section id="moat">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-kicker" data-i18n="moatKicker">02</span>
+      <div>
+        <h2 class="sec-title" data-i18n="moatTitle"></h2>
+        <p class="sec-sub" data-i18n="moatSub"></p>
+      </div>
+    </div>
+    <div class="moat" id="moat"></div>
+  </div>
+</section>
+
+<section id="pricing">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="sec-kicker" data-i18n="priceKicker">03</span>
+      <div>
+        <h2 class="sec-title" data-i18n="priceTitle"></h2>
+        <p class="sec-sub" data-i18n="priceSub"></p>
+      </div>
+    </div>
+    <div class="cards" id="cards"></div>
+  </div>
+</section>
+
+<section id="contact" class="band">
+  <div class="wrap">
+    <h2 data-i18n="bandTitle"></h2>
+    <p data-i18n="bandSub"></p>
+    <a class="btn btn-gold" href="#" data-i18n="ctaPrimary"></a>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot-inner">
+    <b>OSTENTACULUS</b>
+    <span data-i18n="footer">© Ostentaculus · Barcelona · Cinema documental + dados de POS</span>
+  </div>
+</footer>
+
+<script>
+const DICT = {
+  "pt-BR": {
+    brandTag:"Food &amp; Tourism Marketing · Cinema",
+    eyebrow:"Barcelona · Espanha · Portugal · Brasil · LATAM",
+    slogan:'Quando os dados <span class="accent">cheiram a café</span> e os números têm sabor.',
+    live:"Fluxo de dados ao vivo",
+    lede:"Não fazemos vídeo institucional. Filmamos os protagonistas reais de cafeterias, padarias e hotéis, cruzamos com os dados do seu caixa (POS) e transformamos histórias em um ativo previsível de vendas.",
+    ctaPrimary:"Solicitar Auditoria de Vendas de 48h ➔",
+    ctaSecondary:"Ver os 7 vetores",
+    vecKicker:"01 · Modelo",
+    vecTitle:"Sete vetores num único operador",
+    vectors:[
+      ["Cinema Documental","Sony FX3, storytelling de Hollywood aplicado aos fundadores e ao ofício da casa."],
+      ["Growth Marketing","Crescimento mensurável ancorado nos dados reais do caixa (POS)."],
+      ["Neuromarketing","Psicologia do consumidor e neurovendas em cada decisão de tela."],
+      ["Data Science","INE, FRONTUR, EGATUR, TravelBI, Hosteltur + GA4, normalizados."],
+      ["Audiovisual","Produção, roteiro e storytelling com dados, ponta a ponta."],
+      ["Roteiros","Roteiros cinematográficos que retêm no YouTube desde os 30s."],
+      ["Automação & IA","Concierge, recomendações e fluxos operados por 1 pessoa + IA."]
+    ],
+    moatKicker:"02 · Foso",
+    moatTitle:"Superamos os incumbentes por estrutura, não por criatividade",
+    moatSub:"Sair da Ostentaculus custa caro: perde-se o retainer, o documentário, a presença no Canal, as rotas B2B e o dashboard ao vivo.",
+    moat:[
+      ["Emotional Connectivity — Madison Melle","Mini-documentário real + dados de POS"],
+      ["Hospitality Showcase — Hawkins Int'l","Plataforma-comunidade própria + Canal"],
+      ["Agência como departamento — Zö","Dashboard ao vivo + barreira de saída estrutural"]
+    ],
+    priceKicker:"03 · Retainers",
+    priceTitle:"Três portas de entrada",
+    priceSub:"Auditoria em 48h, depois um retainer que se paga na primeira decisão de produto-herói.",
+    cards:[
+      ["Starter","€990"," /mês","",["Auditoria mensal POS","1 mini-documentário/trimestre","Dashboard de KPIs ao vivo","Concierge WhatsApp"]],
+      ["Growth","€2.400"," /mês","Mais escolhido",["Tudo do Starter","2 documentários/mês","Experimentos de growth A/B","Insights de turismo (RAG)"]],
+      ["Scale","€4.900"," /mês","",["Tudo do Growth","Produção audiovisual dedicada","Rotas B2B + comissão","Presença no Canal + App"]]
+    ],
+    bandTitle:"O slogan desarma o cérebro lógico. Os dados fecham a venda.",
+    bandSub:"Fale com a Ostentaculus e receba, em 48h, uma leitura do seu caixa que você ainda não viu.",
+    footer:"© Ostentaculus · Barcelona · Cinema documental + dados de POS"
+  },
+  "es": {
+    brandTag:"Food &amp; Tourism Marketing · Cinema",
+    eyebrow:"Barcelona · España · Portugal · Brasil · LATAM",
+    slogan:'Cuando los datos <span class="accent">huelen a café</span> y los números tienen sabor.',
+    live:"Flujo de datos en vivo",
+    lede:"No hacemos vídeo institucional. Filmamos a los protagonistas reales de cafeterías, panaderías y hoteles, los cruzamos con los datos de tu caja (TPV) y convertimos historias en un activo predecible de ventas.",
+    ctaPrimary:"Solicitar Auditoría de Ventas de 48h ➔",
+    ctaSecondary:"Ver los 7 vectores",
+    vecKicker:"01 · Modelo",
+    vecTitle:"Siete vectores en un solo operador",
+    vectors:[
+      ["Cine Documental","Sony FX3, storytelling de Hollywood aplicado a los fundadores y al oficio de la casa."],
+      ["Growth Marketing","Crecimiento medible anclado en los datos reales de la caja (TPV)."],
+      ["Neuromarketing","Psicología del consumidor y neuroventas en cada decisión de pantalla."],
+      ["Data Science","INE, FRONTUR, EGATUR, TravelBI, Hosteltur + GA4, normalizados."],
+      ["Audiovisual","Producción, guion y storytelling con datos, de principio a fin."],
+      ["Guiones","Guiones cinematográficos que retienen en YouTube desde los 30s."],
+      ["Automatización & IA","Concierge, recomendaciones y flujos operados por 1 persona + IA."]
+    ],
+    moatKicker:"02 · Foso",
+    moatTitle:"Superamos a los incumbentes por estructura, no por creatividad",
+    moatSub:"Salir de Ostentaculus cuesta caro: se pierde el retainer, el documental, la presencia en el Canal, las rutas B2B y el dashboard en vivo.",
+    moat:[
+      ["Emotional Connectivity — Madison Melle","Mini-documental real + datos de TPV"],
+      ["Hospitality Showcase — Hawkins Int'l","Plataforma-comunidad propia + Canal"],
+      ["Agencia como departamento — Zö","Dashboard en vivo + barrera de salida estructural"]
+    ],
+    priceKicker:"03 · Retainers",
+    priceTitle:"Tres puertas de entrada",
+    priceSub:"Auditoría en 48h y luego un retainer que se paga en la primera decisión de producto estrella.",
+    cards:[
+      ["Starter","€990"," /mes","",["Auditoría mensual TPV","1 mini-documental/trimestre","Dashboard de KPIs en vivo","Concierge WhatsApp"]],
+      ["Growth","€2.400"," /mes","Más elegido",["Todo lo de Starter","2 documentales/mes","Experimentos de growth A/B","Insights de turismo (RAG)"]],
+      ["Scale","€4.900"," /mes","",["Todo lo de Growth","Producción audiovisual dedicada","Rutas B2B + comisión","Presencia en el Canal + App"]]
+    ],
+    bandTitle:"El eslogan desarma el cerebro lógico. Los datos cierran la venta.",
+    bandSub:"Habla con Ostentaculus y recibe, en 48h, una lectura de tu caja que aún no has visto.",
+    footer:"© Ostentaculus · Barcelona · Cine documental + datos de TPV"
+  },
+  "en": {
+    brandTag:"Food &amp; Tourism Marketing · Cinema",
+    eyebrow:"Barcelona · Spain · Portugal · Brazil · LATAM",
+    slogan:'When data <span class="accent">smells of coffee</span> and numbers have flavour.',
+    live:"Live data stream",
+    lede:"We don't make corporate video. We film the real protagonists of cafés, bakeries and hotels, cross it with your point-of-sale data, and turn stories into a predictable sales asset.",
+    ctaPrimary:"Request 48h Sales Audit ➔",
+    ctaSecondary:"See the 7 vectors",
+    vecKicker:"01 · Model",
+    vecTitle:"Seven vectors in a single operator",
+    vectors:[
+      ["Documentary Cinema","Sony FX3, Hollywood storytelling applied to the founders and the craft of the house."],
+      ["Growth Marketing","Measurable growth anchored in real point-of-sale data."],
+      ["Neuromarketing","Consumer psychology and neuro-selling in every on-screen decision."],
+      ["Data Science","INE, FRONTUR, EGATUR, TravelBI, Hosteltur + GA4, normalised."],
+      ["Audiovisual","Production, script and data storytelling, end to end."],
+      ["Scriptwriting","Cinematic scripts that hold YouTube retention from the first 30s."],
+      ["Automation & AI","Concierge, recommendations and flows run by 1 person + AI."]
+    ],
+    moatKicker:"02 · Moat",
+    moatTitle:"We beat the incumbents by structure, not by creativity",
+    moatSub:"Leaving Ostentaculus is expensive: you lose the retainer, the documentary, the Channel presence, the B2B routes and the live dashboard.",
+    moat:[
+      ["Emotional Connectivity — Madison Melle","Real mini-documentary + POS data"],
+      ["Hospitality Showcase — Hawkins Int'l","Own community platform + Channel"],
+      ["Agency as a department — Zö","Live dashboard + structural exit barrier"]
+    ],
+    priceKicker:"03 · Retainers",
+    priceTitle:"Three ways in",
+    priceSub:"A 48h audit, then a retainer that pays for itself on the first hero-product decision.",
+    cards:[
+      ["Starter","€990"," /mo","",["Monthly POS Audit","1 mini-documentary/quarter","Live KPI dashboard","WhatsApp concierge"]],
+      ["Growth","€2,400"," /mo","Most chosen",["Everything in Starter","2 documentaries/month","A/B growth experiments","Tourism insights (RAG)"]],
+      ["Scale","€4,900"," /mo","",["Everything in Growth","Dedicated audiovisual production","B2B routes + commission","Channel presence + App"]]
+    ],
+    bandTitle:"The slogan disarms the logical brain. The data closes the sale.",
+    bandSub:"Talk to Ostentaculus and get, within 48h, a reading of your till you haven't seen before.",
+    footer:"© Ostentaculus · Barcelona · Documentary cinema + POS data"
+  }
+};
+
+const $ = (s,r=document)=>r.querySelector(s);
+const $$ = (s,r=document)=>[...r.querySelectorAll(s)];
+
+function setCookie(l){ try{ document.cookie = "NEXT_LOCALE="+l+"; path=/; max-age=31536000; samesite=lax"; }catch(e){} }
+function readCookie(){ const m=document.cookie.match(/(?:^|;\s*)NEXT_LOCALE=([^;]+)/); return m?m[1]:null; }
+
+function render(lang){
+  const d = DICT[lang] || DICT["pt-BR"];
+  document.documentElement.lang = lang;
+  $$("[data-i18n]").forEach(el=>{ const k=el.dataset.i18n; if(d[k]!=null) el.textContent = d[k]; });
+  $$("[data-i18n-html]").forEach(el=>{ const k=el.dataset.i18nHtml; if(d[k]!=null) el.innerHTML = d[k]; });
+
+  // vectors
+  $("#vgrid").innerHTML = d.vectors.map((v,i)=>`
+    <div class="vcell"><div class="num">V${i+1}</div><h3>${v[0]}</h3><p>${v[1]}</p></div>`).join("");
+  // moat
+  $("#moat").innerHTML = d.moat.map(m=>`
+    <div class="moat-row">
+      <div class="them"><b>${lang==="en"?"They":lang==="es"?"Ellos":"Eles"}</b>${m[0]}</div>
+      <div class="arrow">➔</div>
+      <div class="us"><b>Ostentaculus</b><span>${m[1]}</span></div>
+    </div>`).join("");
+  // cards
+  $("#cards").innerHTML = d.cards.map((c,i)=>`
+    <div class="card${i===1?" feature":""}">
+      <div class="tier">${c[3]?`<span class="badge">${c[3]}</span>`:""}${c[0]}</div>
+      <div class="price">${c[1]}<small>${c[2]}</small></div>
+      <ul>${c[4].map(li=>`<li>${li}</li>`).join("")}</ul>
+      <a class="btn ${i===1?"btn-gold":"btn-ghost"}" href="#contact">${d.ctaPrimary.replace(" ➔","")} ➔</a>
+    </div>`).join("");
+
+  // toggle state
+  $$(".lang button").forEach(b=> b.setAttribute("aria-pressed", String(b.dataset.lang===lang)));
+}
+
+function detect(){
+  const c = readCookie(); if(c && DICT[c]) return c;
+  const langs = navigator.languages || [navigator.language || "pt-BR"];
+  for(const l of langs){
+    const t = l.toLowerCase();
+    if(t.startsWith("pt")) return "pt-BR";
+    if(t.startsWith("es")) return "es";
+    if(t.startsWith("en")) return "en";
+  }
+  return "pt-BR";
+}
+
+$$(".lang button").forEach(b=> b.addEventListener("click", ()=>{
+  const l=b.dataset.lang; setCookie(l); render(l);
+}));
+
+render(detect());
+</script>
