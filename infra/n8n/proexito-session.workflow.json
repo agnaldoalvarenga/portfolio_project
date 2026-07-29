@@ -1,0 +1,139 @@
+{
+  "name": "ProÊxito — Sessão WhatsApp (texto + áudio + vídeo)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "proexito-session",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "name": "Reply / botão (from Next.js)",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "language": "javaScript",
+        "jsCode": "// Runs inside the 24h customer-service window opened by the subscriber's reply\n// (e.g. tapping the welcome template's quick-reply button). Free-form text,\n// audio and video are allowed here. Payload is forwarded + HMAC-signed by the\n// Next.js WhatsApp webhook, which already resolved the subscriber (goal/lang).\nconst crypto = require('crypto');\nconst secret = $env.N8N_SHARED_SECRET;\nconst raw = JSON.stringify($json.body);\nconst expected = 'sha256=' + crypto.createHmac('sha256', secret).update(raw).digest('hex');\nconst got = $json.headers['x-ostentaculus-signature'] || '';\nconst a = Buffer.from(expected); const b = Buffer.from(got);\nif (a.length !== b.length || !crypto.timingSafeEqual(a, b)) { throw new Error('Invalid ingress signature'); }\n\nconst p = $json.body;\nconst phone = String(p.phone || p.from || '').replace(/\\D/g, '');\nif (!phone) throw new Error('phone missing');\nconst lang = (p.lang === 'es') ? 'es' : 'pt';\nconst goalRaw = ['sono', 'ansiedade', 'foco'].includes(p.goal) ? p.goal : 'default';\nconst key = goalRaw.toUpperCase();            // SONO | ANSIEDADE | FOCO | DEFAULT\nconst L = lang.toUpperCase();                 // PT | ES\nconst first = String(p.name || '').trim().split(' ')[0] || (lang === 'es' ? '' : '');\n\n// Personalised opening line by goal + language.\nconst LINES = {\n  pt: {\n    sono:      'Que bom te ver por aqui 🌙 Vamos começar pelo seu sono. Ouça este áudio deitado, hoje à noite:',\n    ansiedade: 'Respire fundo — você chegou 💙 Vamos começar baixando a ansiedade. Ouça este áudio agora:',\n    foco:      'Bora começar 🎯 Vamos treinar o seu foco. Ouça este áudio antes da próxima tarefa:',\n    default:   'Que bom te ver por aqui 🌙 Preparei algo para você começar. Ouça este áudio:'\n  },\n  es: {\n    sono:      'Qué bien tenerte aquí 🌙 Empezamos por tu sueño. Escucha este audio tumbado, esta noche:',\n    ansiedade: 'Respira hondo — has llegado 💙 Empezamos bajando la ansiedad. Escucha este audio ahora:',\n    foco:      'Vamos a empezar 🎯 Entrenamos tu foco. Escucha este audio antes de tu próxima tarea:',\n    default:   'Qué bien tenerte aquí 🌙 Preparé algo para empezar. Escucha este audio:'\n  }\n};\nconst text = LINES[lang][goalRaw] || LINES[lang].default;\nconst audioUrl = $env['PX_AUDIO_' + key + '_' + L] || $env['PX_AUDIO_DEFAULT_' + L];\nconst videoUrl = $env['PX_VIDEO_' + key + '_' + L] || $env['PX_VIDEO_DEFAULT_' + L];\nconst videoCaption = lang === 'es' ? 'Tu primera práctica guiada 🎬' : 'Sua primeira prática guiada 🎬';\nreturn [{ json: { phone, lang, goal: goalRaw, text, audioUrl, videoUrl, videoCaption } }];"
+      },
+      "name": "Verify HMAC + prep",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [480, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/{{ $env.WHATSAPP_GRAPH_VERSION }}/{{ $env.WHATSAPP_PHONE_NUMBER_ID }}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "authorization", "value": "=Bearer {{ $env.WHATSAPP_ACCESS_TOKEN }}" },
+            { "name": "content-type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"messaging_product\": \"whatsapp\", \"to\": \"{{ $json.phone }}\", \"type\": \"text\", \"text\": { \"preview_url\": false, \"body\": {{ JSON.stringify($json.text) }} } }",
+        "options": {}
+      },
+      "name": "1) Enviar TEXTO",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [720, 300]
+    },
+    {
+      "parameters": { "resume": "timeInterval", "amount": 3, "unit": "seconds" },
+      "name": "pausa",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [960, 300],
+      "webhookId": "proexito-wait-1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/{{ $env.WHATSAPP_GRAPH_VERSION }}/{{ $env.WHATSAPP_PHONE_NUMBER_ID }}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "authorization", "value": "=Bearer {{ $env.WHATSAPP_ACCESS_TOKEN }}" },
+            { "name": "content-type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"messaging_product\": \"whatsapp\", \"to\": {{ JSON.stringify($('Verify HMAC + prep').item.json.phone) }}, \"type\": \"audio\", \"audio\": { \"link\": {{ JSON.stringify($('Verify HMAC + prep').item.json.audioUrl) }} } }",
+        "options": {}
+      },
+      "name": "2) Enviar ÁUDIO",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1200, 300]
+    },
+    {
+      "parameters": { "resume": "timeInterval", "amount": 4, "unit": "seconds" },
+      "name": "pausa 2",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [1440, 300],
+      "webhookId": "proexito-wait-2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/{{ $env.WHATSAPP_GRAPH_VERSION }}/{{ $env.WHATSAPP_PHONE_NUMBER_ID }}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "authorization", "value": "=Bearer {{ $env.WHATSAPP_ACCESS_TOKEN }}" },
+            { "name": "content-type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"messaging_product\": \"whatsapp\", \"to\": {{ JSON.stringify($('Verify HMAC + prep').item.json.phone) }}, \"type\": \"video\", \"video\": { \"link\": {{ JSON.stringify($('Verify HMAC + prep').item.json.videoUrl) }}, \"caption\": {{ JSON.stringify($('Verify HMAC + prep').item.json.videoCaption) }} } }",
+        "options": {}
+      },
+      "name": "3) Enviar VÍDEO",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1680, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.SUPABASE_URL }}/rest/v1/px_onboarding_log",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $env.SUPABASE_SERVICE_ROLE }}" },
+            { "name": "authorization", "value": "=Bearer {{ $env.SUPABASE_SERVICE_ROLE }}" },
+            { "name": "content-type", "value": "application/json" },
+            { "name": "prefer", "value": "return=minimal" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"phone\": {{ JSON.stringify($('Verify HMAC + prep').item.json.phone) }}, \"lang\": {{ JSON.stringify($('Verify HMAC + prep').item.json.lang) }}, \"goal\": {{ JSON.stringify($('Verify HMAC + prep').item.json.goal) }}, \"step\": \"session_text_audio_video\" }",
+        "options": {}
+      },
+      "name": "Log to Supabase",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1920, 300]
+    }
+  ],
+  "connections": {
+    "Reply / botão (from Next.js)": { "main": [[{ "node": "Verify HMAC + prep", "type": "main", "index": 0 }]] },
+    "Verify HMAC + prep": { "main": [[{ "node": "1) Enviar TEXTO", "type": "main", "index": 0 }]] },
+    "1) Enviar TEXTO": { "main": [[{ "node": "pausa", "type": "main", "index": 0 }]] },
+    "pausa": { "main": [[{ "node": "2) Enviar ÁUDIO", "type": "main", "index": 0 }]] },
+    "2) Enviar ÁUDIO": { "main": [[{ "node": "pausa 2", "type": "main", "index": 0 }]] },
+    "pausa 2": { "main": [[{ "node": "3) Enviar VÍDEO", "type": "main", "index": 0 }]] },
+    "3) Enviar VÍDEO": { "main": [[{ "node": "Log to Supabase", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" }
+}

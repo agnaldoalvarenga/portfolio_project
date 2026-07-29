@@ -1,0 +1,77 @@
+{
+  "name": "ProÊxito — Onboarding WhatsApp (trial 7 dias)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "proexito-onboarding",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "name": "Trial started (from Next.js)",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "language": "javaScript",
+        "jsCode": "// Verify the HMAC forwarded by the Next.js Stripe webhook (same pattern as the\n// concierge workflow) and normalize the subscriber payload.\nconst crypto = require('crypto');\nconst secret = $env.N8N_SHARED_SECRET;\nconst raw = JSON.stringify($json.body);\nconst expected = 'sha256=' + crypto.createHmac('sha256', secret).update(raw).digest('hex');\nconst got = $json.headers['x-ostentaculus-signature'] || '';\nconst a = Buffer.from(expected); const b = Buffer.from(got);\nif (a.length !== b.length || !crypto.timingSafeEqual(a, b)) { throw new Error('Invalid ingress signature'); }\n\nconst p = $json.body;\n// Only act on the ProÊxito B2C trial product; ignore anything else.\nif (p.product !== 'proexito_trial') return [];\nconst phone = String(p.phone || '').replace(/\\D/g, '');\nif (!phone) throw new Error('Subscriber phone missing — enable phone_number_collection or resolve the lead first');\nconst lang = (p.lang === 'es') ? 'es' : 'pt';\nconst goal = ['sono', 'ansiedade', 'foco'].includes(p.goal) ? p.goal : 'bem-estar';\nconst firstName = String(p.name || '').trim().split(' ')[0] || (lang === 'es' ? 'hola' : 'olá');\n// Template + video header URL per language (approved in Meta Business Manager).\nconst template = lang === 'es' ? 'proexito_bienvenida' : 'proexito_boasvindas';\nconst langCode = lang === 'es' ? 'es_ES' : 'pt_BR';\nconst videoUrl = lang === 'es' ? $env.PX_WELCOME_VIDEO_URL_ES : $env.PX_WELCOME_VIDEO_URL_PT;\nreturn [{ json: { phone, lang, goal, firstName, template, langCode, videoUrl, email: p.email || null } }];"
+      },
+      "name": "Verify HMAC + prep lead",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [480, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/{{ $env.WHATSAPP_GRAPH_VERSION }}/{{ $env.WHATSAPP_PHONE_NUMBER_ID }}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "authorization", "value": "=Bearer {{ $env.WHATSAPP_ACCESS_TOKEN }}" },
+            { "name": "content-type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"messaging_product\": \"whatsapp\", \"to\": \"{{ $json.phone }}\", \"type\": \"template\", \"template\": { \"name\": \"{{ $json.template }}\", \"language\": { \"code\": \"{{ $json.langCode }}\" }, \"components\": [ { \"type\": \"header\", \"parameters\": [ { \"type\": \"video\", \"video\": { \"link\": {{ JSON.stringify($json.videoUrl) }} } } ] }, { \"type\": \"body\", \"parameters\": [ { \"type\": \"text\", \"text\": {{ JSON.stringify($json.firstName) }} }, { \"type\": \"text\", \"text\": {{ JSON.stringify($json.goal) }} } ] } ] } }",
+        "options": {}
+      },
+      "name": "Send welcome template (texto + vídeo)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [720, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.SUPABASE_URL }}/rest/v1/px_onboarding_log",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "apikey", "value": "={{ $env.SUPABASE_SERVICE_ROLE }}" },
+            { "name": "authorization", "value": "=Bearer {{ $env.SUPABASE_SERVICE_ROLE }}" },
+            { "name": "content-type", "value": "application/json" },
+            { "name": "prefer", "value": "return=minimal" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"phone\": {{ JSON.stringify($('Verify HMAC + prep lead').item.json.phone) }}, \"lang\": {{ JSON.stringify($('Verify HMAC + prep lead').item.json.lang) }}, \"goal\": {{ JSON.stringify($('Verify HMAC + prep lead').item.json.goal) }}, \"step\": \"welcome_template\", \"wa_message_id\": {{ JSON.stringify($json.messages ? $json.messages[0].id : null) }} }",
+        "options": {}
+      },
+      "name": "Log to Supabase",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [960, 300]
+    }
+  ],
+  "connections": {
+    "Trial started (from Next.js)": { "main": [[{ "node": "Verify HMAC + prep lead", "type": "main", "index": 0 }]] },
+    "Verify HMAC + prep lead": { "main": [[{ "node": "Send welcome template (texto + vídeo)", "type": "main", "index": 0 }]] },
+    "Send welcome template (texto + vídeo)": { "main": [[{ "node": "Log to Supabase", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" }
+}
